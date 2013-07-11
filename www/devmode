@@ -16,6 +16,11 @@ function watch_changes() {
 	FILE=$1
 	TARGET="$(target_name_from_file $FILE)"
 
+	if [ ! -f $FILE ]; then
+		echo "Cannot find file '$FILE'. Exiting..."
+		exit
+	fi
+
 	echo "Watching for changes in '$FILE' every $TIMEOUT sec."
 	echo "Redirecting dart2js logs to $LOG"
 	while true; do
