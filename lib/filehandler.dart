@@ -1,5 +1,7 @@
+library filehandler;
 import "dart:io";
 
+//TODO Add headers depending on the file extension
 class FileHandler {
   static final String DOCUMENT_ROOT = "www";
 
