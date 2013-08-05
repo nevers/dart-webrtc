@@ -69,6 +69,10 @@ void handleMessage(message) {
       var clientId = parsedData["clientId"];
       handleOffer(clientId, messageContent);
       break;
+    case "answer":
+      var clientId = parsedData["clientId"];
+      handleAnswer(clientId, messageContent);
+      break;
   }
 }
 
@@ -83,13 +87,17 @@ void handleCliendIds(List clientIds) {
 void handleOffer(clientId, offer) {
   var receivingRtcPeerConnection = createRtcPeerConnection();
   receivingRtcPeerConnections.add(receivingRtcPeerConnection);
-  receivingRtcPeerConnection.setRemoteDescription(offer);
+  receivingRtcPeerConnection.setRemoteDescription(new RtcSessionDescription(offer));
   receivingRtcPeerConnection.createAnswer({}).then((RtcSessionDescription description) {
     receivingRtcPeerConnection.setLocalDescription(description);
     var data = {"type": "answer", "targetClientId": clientId, "content": {"sdp": description.sdp, "type": description.type}};
-    print("Want to send answer to ${clientId}, ${data}");
+    sendMessage(JSON.stringify(data));
   });
   log("Received offer: ${offer}");
+}
+
+void handleAnswer(clientId, answer) {
+  log("Got answer from ${clientId}");
 }
 
 void sendOffer(clientId, sendingRtcPeerConnection) {

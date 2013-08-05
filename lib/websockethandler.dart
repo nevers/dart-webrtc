@@ -49,14 +49,17 @@ class WebSocketHandler {
   void handleData(WebSocket socket, String data) {
     print("Received data: ${data}");
     var parsedData = JSON.parse(data);
-    var messageType = parsedData["type"];
-    var clientId = parsedData["targetClientId"];
-    var messageContent = parsedData["content"];
-    switch(messageType) {
-      case "offer":
-        handleOffer(clientId, messageContent);
-        break;
-    }
+    //var messageType = parsedData["type"];
+    var targetClientId = parsedData["targetClientId"];
+    parsedData["clientId"] = socket.hashCode;
+    //var messageContent = parsedData["content"];
+    //switch(messageType) {
+    //  case "offer":
+    //    handleOffer(clientId, messageContent);
+    //    break;
+    //}
+    var targetSocket = getSocketFromClientId(targetClientId);
+    sendMessage(targetSocket, JSON.stringify(parsedData));
   }
 
   void handleOffer(clientId, messageContent) {
