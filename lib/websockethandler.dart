@@ -51,7 +51,7 @@ class WebSocketHandler {
     var parsedData = JSON.parse(data);
     //var messageType = parsedData["type"];
     var targetClientId = parsedData["targetClientId"];
-    parsedData["clientId"] = socket.hashCode;
+    parsedData["originClientId"] = socket.hashCode;
     //var messageContent = parsedData["content"];
     //switch(messageType) {
     //  case "offer":
