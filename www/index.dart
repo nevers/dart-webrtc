@@ -2,8 +2,10 @@ import "dart:html";
 import "dart:json" as JSON;
 
 WebSocket webSocket;
-var  sendingRtcPeerConnections;
-var  receivingRtcPeerConnections;
+var sendingRtcPeerConnections;
+var receivingRtcPeerConnections;
+var sendingRtcPeerConnectionIceCandidates;
+var receivingRtcPeerConnectionIceCandidates;
 
 void main() {
   sendingRtcPeerConnections = new Map();
@@ -79,9 +81,17 @@ void handleMessage(message) {
 
 void handleCliendIds(List clientIds) {
   clientIds.forEach((id) {
-    var sendingRtcPeerConnection = createRtcPeerConnection();
-    sendingRtcPeerConnections[id] = sendingRtcPeerConnection;
-    sendOffer(id, sendingRtcPeerConnection); 
+    sendingRtcPeerConnections[id] = createRtcPeerConnection();
+   // sendOffer(id, sendingRtcPeerConnections[id]);
+  });
+
+  //This callback will only be fired when the laptop lid is not closed.
+  window.navigator.getUserMedia(audio: true, video: true).then((stream) {
+    log("Get usermedia found stream: $stream");
+    sendingRtcPeerConnections.forEach((id, sendingRtcPeerConnection) {
+      sendingRtcPeerConnection.addStream(stream);
+      sendOffer(id, sendingRtcPeerConnection); 
+    });
   });
 }
 
@@ -117,12 +127,17 @@ void handleAnswer(originClientId, answer) {
 }
 
 void handleReceiverCandidate(originClientId, candidate) {
-  //var candidate = new RtcIceCandidate({"sdpMLineIndex": candidate.sdpMLineIndex, "candidate": candidate.candidate});
-  log("handleReceiverCandidate: ${originClientId}");
+  var rtcIceCandidate = new RtcIceCandidate({"sdpMLineIndex": candidate["sdpMLineIndex"], "candidate": candidate["candidate"]});
+  log("handleReceiverCandidate: ${rtcIceCandidate}");
+  var sendingRtcPeerConnection = sendingRtcPeerConnections[originClientId];
+  sendingRtcPeerConnection.addIceCandidate(rtcIceCandidate);
 }
 
 void handleSenderCandidate(originClientId, candidate) {
-  log("handleSenderCandidate: ${originClientId}");
+  var rtcIceCandidate = new RtcIceCandidate({"sdpMLineIndex": candidate["sdpMLineIndex"], "candidate": candidate["candidate"]});
+  log("handleSenderCandidate: ${rtcIceCandidate}");
+  var receivingRtcPeerConnection = receivingRtcPeerConnections[originClientId];
+ receivingRtcPeerConnection.addIceCandidate(rtcIceCandidate);
 }
 
 void handleError(errorMessage) {
