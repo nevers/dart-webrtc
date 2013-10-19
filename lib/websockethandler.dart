@@ -2,7 +2,7 @@ library websockethandler;
 
 import "dart:io";
 import "dart:async";
-import "dart:json" as JSON;
+import "dart:convert";
 
 class WebSocketHandler {
   StreamController streamController;
@@ -33,12 +33,12 @@ class WebSocketHandler {
   void sendClientIds() {
     sockets.forEach((socket) {
       var clientIds = getClientIds(socket);
-      var data = JSON.stringify({"type": "clientIds", "content": clientIds}); 
+      var data = JSON.encode({"type": "clientIds", "content": clientIds}); 
       sendMessage(socket, data);
     });
   } 
 
-  void getClientIds(excludedSocket) {
+  List getClientIds(excludedSocket) {
     return sockets.where((socket) => socket != excludedSocket).map((socket) => socket.hashCode).toList();
   }
 
@@ -48,7 +48,7 @@ class WebSocketHandler {
 
   void handleData(WebSocket socket, String data) {
     print("Received data: ${data}");
-    var parsedData = JSON.parse(data);
+    var parsedData = JSON.decode(data);
     //var messageType = parsedData["type"];
     var targetClientId = parsedData["targetClientId"];
     parsedData["clientId"] = socket.hashCode;
@@ -59,13 +59,13 @@ class WebSocketHandler {
     //    break;
     //}
     var targetSocket = getSocketFromClientId(targetClientId);
-    sendMessage(targetSocket, JSON.stringify(parsedData));
+    sendMessage(targetSocket, JSON.encode(parsedData));
   }
 
   void handleOffer(clientId, messageContent) {
     var socket = getSocketFromClientId(clientId);
     var data = {"type": "offer", "clientId": clientId, "content": messageContent};
-    sendMessage(socket, JSON.stringify(data));
+    sendMessage(socket, JSON.encode(data));
   }
 
   void broadcastMessage(WebSocket excludedSocket, message) {

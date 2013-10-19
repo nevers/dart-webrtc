@@ -1,5 +1,5 @@
 import "dart:html";
-import "dart:json" as JSON;
+import "dart:convert";
 
 WebSocket webSocket;
 Set<RtcPeerConnection> sendingRtcPeerConnections;
@@ -58,7 +58,7 @@ void handleClose(closeEvent) {
 
 void handleMessage(message) {
   //log("Received message: ${message.data}");
-  var parsedData = JSON.parse(message.data);
+  var parsedData = JSON.decode(message.data);
   var messageContent = parsedData["content"];
   var messageType = parsedData["type"];
   switch(messageType) {
@@ -91,7 +91,7 @@ void handleOffer(clientId, offer) {
   receivingRtcPeerConnection.createAnswer({}).then((RtcSessionDescription description) {
     receivingRtcPeerConnection.setLocalDescription(description);
     var data = {"type": "answer", "targetClientId": clientId, "content": {"sdp": description.sdp, "type": description.type}};
-    sendMessage(JSON.stringify(data));
+    sendMessage(JSON.encode(data));
   });
   log("Received offer: ${offer}");
 }
@@ -104,7 +104,7 @@ void sendOffer(clientId, sendingRtcPeerConnection) {
   sendingRtcPeerConnection.createOffer({}).then((RtcSessionDescription description) {
     sendingRtcPeerConnection.setLocalDescription(description); 
     var data = {"type": "offer", "targetClientId": clientId, "content":  {"sdp": description.sdp, "type": description.type}};
-    sendMessage(JSON.stringify(data));
+    sendMessage(JSON.encode(data));
   }); 
 }
 
