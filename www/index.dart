@@ -1,15 +1,34 @@
 import "dart:html";
-import "dart:json" as JSON;
+import "dart:async";
+import "dart:convert";
+
+class CachingUserMediaRetriever {
+  MediaStream mediaStream;
+  
+  Future<MediaStream> get() {
+    Completer completer = new Completer<MediaStream>(); 
+    if(mediaStream != null)
+      completer.complete(mediaStream);
+    else
+      window.navigator.getUserMedia(audio: false, video: true).then((MediaStream stream) {
+        mediaStream = stream;
+        completer.complete(mediaStream);
+      });
+    return completer.future;
+  }
+}
 
 WebSocket webSocket;
 var sendingRtcPeerConnections;
 var receivingRtcPeerConnections;
 var sendingRtcPeerConnectionIceCandidates;
 var receivingRtcPeerConnectionIceCandidates;
+var cachingUserMediaRetriever;
 
 void main() {
   sendingRtcPeerConnections = new Map();
   receivingRtcPeerConnections = new Map();
+  cachingUserMediaRetriever = new CachingUserMediaRetriever();
   
   var uri = "ws://" + window.location.host + "/ws";
   log("Creating websocket to: '$uri'");
@@ -19,13 +38,6 @@ void main() {
   webSocket.onClose.listen(handleClose);
   webSocket.onMessage.listen(handleMessage);
   webSocket.onError.listen(handleError);
-
-  //var webcam = new DivElement();
-  //webcam.classes.add("webcam");
-  //webcam.text = "webcam content";
-
-  //var webcams = query("#webcams");
-  //webcams.children.add(webcam);
 }
 
 RtcPeerConnection createRtcPeerConnection() {
@@ -42,8 +54,8 @@ RtcPeerConnection createRtcPeerConnection() {
 
 
 void sendMessage(message) {
-  log("Sending message: '$message'");
-  webSocket.send(JSON.stringify(message));  
+  log("Sending message: targetClientId='${message["targetClientId"]}' type='${message["type"]}'");
+  webSocket.send(JSON.encode(message));  
 }
 
 void handleOpen(message) {
@@ -55,11 +67,13 @@ void handleClose(closeEvent) {
 }
 
 void handleMessage(message) {
-  log("Received message: ${message.data}");
-  var parsedData = JSON.parse(message.data);
-  var messageContent = parsedData["content"];
+  var parsedData = JSON.decode(message.data);
   var messageType = parsedData["type"];
   var originClientId = parsedData["originClientId"];
+  var messageContent = parsedData["content"];
+  
+  log("Received message: originClientId='${originClientId}' messageType='${messageType}'");
+  
   switch(messageType) {
     case "clientIds":
       handleCliendIds(messageContent);
@@ -85,9 +99,7 @@ void handleCliendIds(List clientIds) {
    // sendOffer(id, sendingRtcPeerConnections[id]);
   });
 
-  //This callback will only be fired when the laptop lid is not closed.
-  window.navigator.getUserMedia(audio: true, video: true).then((stream) {
-    log("Get usermedia found stream: $stream");
+  cachingUserMediaRetriever.get().then((MediaStream stream) {
     sendingRtcPeerConnections.forEach((id, sendingRtcPeerConnection) {
       sendingRtcPeerConnection.addStream(stream);
       sendOffer(id, sendingRtcPeerConnection); 
@@ -118,6 +130,20 @@ void handleOffer(originClientId, offer) {
     if(event.candidate != null)
       sendMessage({"type": "receiverCandidate", "targetClientId": originClientId, "content": {"sdpMLineIndex": event.candidate.sdpMLineIndex, "candidate": event.candidate.candidate}});
   });
+  receivingRtcPeerConnection.onAddStream.listen((MediaStreamEvent event) {
+    addWebcam(event.stream);
+  });
+}
+
+void addWebcam(MediaStream stream) {
+  log("Adding webcam: stream='${stream}'");
+  var video = new VideoElement();
+  video.classes.add("video");
+  video.src = Url.createObjectUrl(stream);
+  video.onLoadedData.listen((Event event) {
+    video.play();
+  });
+  query("#videos").children.add(video);
 }
 
 void handleAnswer(originClientId, answer) {
@@ -128,14 +154,14 @@ void handleAnswer(originClientId, answer) {
 
 void handleReceiverCandidate(originClientId, candidate) {
   var rtcIceCandidate = new RtcIceCandidate({"sdpMLineIndex": candidate["sdpMLineIndex"], "candidate": candidate["candidate"]});
-  log("handleReceiverCandidate: ${rtcIceCandidate}");
+  log("handleReceiverCandidate: originClientId=${originClientId}");
   var sendingRtcPeerConnection = sendingRtcPeerConnections[originClientId];
   sendingRtcPeerConnection.addIceCandidate(rtcIceCandidate);
 }
 
 void handleSenderCandidate(originClientId, candidate) {
   var rtcIceCandidate = new RtcIceCandidate({"sdpMLineIndex": candidate["sdpMLineIndex"], "candidate": candidate["candidate"]});
-  log("handleSenderCandidate: ${rtcIceCandidate}");
+  log("handleSenderCandidate: originClientId='${originClientId}'");
   var receivingRtcPeerConnection = receivingRtcPeerConnections[originClientId];
  receivingRtcPeerConnection.addIceCandidate(rtcIceCandidate);
 }

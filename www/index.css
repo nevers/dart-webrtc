@@ -2,15 +2,15 @@
 	display: none;
 }
 
-#webcams {
-  border: solid 1px black;
+#videos {
+  /*border: solid 1px black;*/
   display: table;
   margin-left: auto;
   margin-right: auto;
   max-width: 800px;
 }
 
-.webcam {
+.video {
   border: solid 1px grey;
   width: 200px;
   height: 100px;
