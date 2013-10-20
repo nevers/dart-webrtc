@@ -21,13 +21,13 @@ class CachingUserMediaRetriever {
 WebSocket webSocket;
 var sendingRtcPeerConnections;
 var receivingRtcPeerConnections;
-var sendingRtcPeerConnectionIceCandidates;
-var receivingRtcPeerConnectionIceCandidates;
+var receivingVideoElements;
 var cachingUserMediaRetriever;
 
 void main() {
   sendingRtcPeerConnections = new Map();
   receivingRtcPeerConnections = new Map();
+  receivingVideoElements = new Map();
   cachingUserMediaRetriever = new CachingUserMediaRetriever();
   
   var uri = "ws://" + window.location.host + "/ws";
@@ -78,6 +78,12 @@ void handleMessage(message) {
     case "clientIds":
       handleCliendIds(messageContent);
       break;
+    case "clientAdd":
+      createSendingRtcPeerConnection(messageContent);
+      break;
+    case "clientRemove":
+      handleClientRemove(messageContent);
+      break;
     case "offer":
       handleOffer(originClientId, messageContent);
       break;
@@ -94,17 +100,26 @@ void handleMessage(message) {
 }
 
 void handleCliendIds(List clientIds) {
+  log("handleClientIds: clientIds='${clientIds}'");
   clientIds.forEach((id) {
-    sendingRtcPeerConnections[id] = createRtcPeerConnection();
-   // sendOffer(id, sendingRtcPeerConnections[id]);
+    createSendingRtcPeerConnection(id);
   });
+}
 
+void createSendingRtcPeerConnection(id) {
+  RtcPeerConnection sendingRtcPeerConnection = createRtcPeerConnection();; 
+  sendingRtcPeerConnections[id] = sendingRtcPeerConnection;
   cachingUserMediaRetriever.get().then((MediaStream stream) {
-    sendingRtcPeerConnections.forEach((id, sendingRtcPeerConnection) {
-      sendingRtcPeerConnection.addStream(stream);
-      sendOffer(id, sendingRtcPeerConnection); 
-    });
+    sendingRtcPeerConnection.addStream(stream);
+    sendOffer(id, sendingRtcPeerConnection);    
   });
+}
+
+void handleClientRemove(id) {
+  RtcPeerConnection sendingRtcPeerConnection = receivingRtcPeerConnections[id];
+  sendingRtcPeerConnection.close();
+  receivingRtcPeerConnections.remove(id);
+  removeWebCam(id);
 }
 
 void sendOffer(originClientId, sendingRtcPeerConnection) {
@@ -131,11 +146,15 @@ void handleOffer(originClientId, offer) {
       sendMessage({"type": "receiverCandidate", "targetClientId": originClientId, "content": {"sdpMLineIndex": event.candidate.sdpMLineIndex, "candidate": event.candidate.candidate}});
   });
   receivingRtcPeerConnection.onAddStream.listen((MediaStreamEvent event) {
-    addWebcam(event.stream);
+    addWebcam(originClientId, event.stream);
+  });
+  receivingRtcPeerConnection.onIceConnectionStateChange.listen((Event event){
+    if(receivingRtcPeerConnection.iceConnectionState == "disconnected" && receivingRtcPeerConnections.containsKey(originClientId)) 
+      handleClientRemove(originClientId); 
   });
 }
 
-void addWebcam(MediaStream stream) {
+void addWebcam(originClientId, MediaStream stream) {
   log("Adding webcam: stream='${stream}'");
   var video = new VideoElement();
   video.classes.add("video");
@@ -144,6 +163,13 @@ void addWebcam(MediaStream stream) {
     video.play();
   });
   query("#videos").children.add(video);
+  receivingVideoElements[originClientId] = video;
+}
+
+void removeWebCam(originClientId) {
+  VideoElement video = receivingVideoElements[originClientId];
+  video.pause();
+  video.remove();
 }
 
 void handleAnswer(originClientId, answer) {

@@ -1,3 +1,4 @@
+- Cleanup leaking sendingRtcStreams when refreshing & no server
 - Fix MIME type detection 
 - Fix stacktraces: wanneer ge een sessie refreshed:
 Front-end:
@@ -10,11 +11,14 @@ _callInIsolate isolate_helper.dart:62
 invokeClosure js_helper.dart:1509
 (anonymous function)
 backend:
+nick-desktop:dart nevers$ dart server.dart 
+Starting server
+Listening for connections at 0.0.0.0:1337
 Uncaught Error: Bad state: No matching element
 Stack Trace:
 #0      IterableBase.firstWhere (dart:collection/iterable.dart:340)
 #1      WebSocketHandler.getSocketFromClientId (file:///Users/nevers/developer/dart/lib/websockethandler.dart:46:30)
-#2      WebSocketHandler.handleData (file:///Users/nevers/developer/dart/lib/websockethandler.dart:61:45)
+#2      WebSocketHandler.handleData (file:///Users/nevers/developer/dart/lib/websockethandler.dart:53:45)
 #3      handleWebSocketConnection.<anonymous closure> (file:///Users/nevers/developer/dart/lib/websockethandler.dart:23:21)
 #4      _rootRunUnary (dart:async/zone.dart:543)
 #5      _ZoneDelegate.runUnary (dart:async/zone.dart:353)
@@ -96,6 +100,7 @@ Stack Trace:
 #81     _NativeSocket.multiplex (dart:io-patch/socket_patch.dart:493)
 #82     _NativeSocket.connectToEventHandler.<anonymous closure> (dart:io-patch/socket_patch.dart:592)
 #83     _ReceivePortImpl._handleMessage (dart:isolate-patch/isolate_patch.dart:113)
+
 
 Unhandled exception:
 Bad state: No matching element

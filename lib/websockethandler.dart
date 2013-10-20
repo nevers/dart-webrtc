@@ -22,54 +22,57 @@ class WebSocketHandler {
     socket.listen((data) {
           handleData(socket, data);          
         }, onDone: () {
-          sockets.remove(socket);
+          sendClientRemove(socket);
         }, onError: (error) {
-          sockets.remove(socket);
+          sendClientRemove(socket);
     });
     sockets.add(socket);
-    sendClientIds();
+    sendClientIds(socket);
+    sendClientAdd(socket);
   }
 
-  void sendClientIds() {
-    sockets.forEach((socket) {
-      var clientIds = getClientIds(socket);
-      var data = JSON.encode({"type": "clientIds", "content": clientIds}); 
-      sendMessage(socket, data);
-    });
-  } 
-
-  List getClientIds(excludedSocket) {
-    return sockets.where((socket) => socket != excludedSocket).map((socket) => socket.hashCode).toList();
+  void sendClientIds(WebSocket socket) {
+    var clientIds = getClientIdsExcl(socket);
+    var data = JSON.encode({"type": "clientIds", "content": clientIds}); 
+    sendMessage(socket, data);
+  }
+  
+  void sendClientAdd(WebSocket socket) {
+    var data = JSON.encode({"type": "clientAdd", "content": getClientId(socket)});
+    broadcastMessageExcl(socket, data);
+  }
+  
+  void sendClientRemove(WebSocket socket) {
+    var data = JSON.encode({"type": "clientRemove", "content": getClientId(socket)});
+    broadcastMessage(data); 
+    sockets.remove(socket);
   }
 
   void getSocketFromClientId(clientId) {
-    return sockets.firstWhere((socket) => socket.hashCode == clientId);
+    return sockets.firstWhere((socket) => getClientId(socket) == clientId);
   }
 
   void handleData(WebSocket socket, String data) {
-    print("Received data: ${data}");
     var parsedData = JSON.decode(data);
-    //var messageType = parsedData["type"];
     var targetClientId = parsedData["targetClientId"];
-    parsedData["originClientId"] = socket.hashCode;
-    //var messageContent = parsedData["content"];
-    //switch(messageType) {
-    //  case "offer":
-    //    handleOffer(clientId, messageContent);
-    //    break;
-    //}
+    parsedData["originClientId"] = getClientId(socket);
     var targetSocket = getSocketFromClientId(targetClientId);
     sendMessage(targetSocket, JSON.encode(parsedData));
   }
 
-  void handleOffer(clientId, messageContent) {
-    var socket = getSocketFromClientId(clientId);
-    var data = {"type": "offer", "clientId": clientId, "content": messageContent};
-    sendMessage(socket, JSON.encode(data));
+  int getClientId(socket) {
+    return socket.hashCode;
   }
-
-  void broadcastMessage(WebSocket excludedSocket, message) {
-    print("Broadcasting message: ${message}");
+  
+  List getClientIdsExcl(excludedSocket) {
+    return sockets.where((socket) => socket != excludedSocket).map((socket) => getClientId(socket)).toList();
+  }
+  
+  void broadcastMessage(message) {
+    broadcastMessageExcl(null, message);
+  }
+  
+  void broadcastMessageExcl(WebSocket excludedSocket, message) {
     sockets.forEach((socket) {
       if(excludedSocket == socket)
         return;
