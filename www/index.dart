@@ -116,10 +116,14 @@ void createSendingRtcPeerConnection(id) {
 }
 
 void handleClientRemove(id) {
-  RtcPeerConnection sendingRtcPeerConnection = receivingRtcPeerConnections[id];
-  sendingRtcPeerConnection.close();
+  RtcPeerConnection receivingRtcPeerConnection = receivingRtcPeerConnections[id];
+  receivingRtcPeerConnection.close();
   receivingRtcPeerConnections.remove(id);
   removeWebCam(id);
+  
+  RtcPeerConnection sendingRtcPeerConnection = sendingRtcPeerConnections[id];
+  sendingRtcPeerConnection.close();
+  sendingRtcPeerConnections.remove(id);
 }
 
 void sendOffer(originClientId, sendingRtcPeerConnection) {
@@ -162,7 +166,7 @@ void addWebcam(originClientId, MediaStream stream) {
   video.onLoadedData.listen((Event event) {
     video.play();
   });
-  query("#videos").children.add(video);
+  querySelector("#videos").children.add(video);
   receivingVideoElements[originClientId] = video;
 }
 
