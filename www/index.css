@@ -1,17 +1,56 @@
-.hidden {
-	display: none;
+@font-face {
+	font-family: bigNoodle;
+	src: url("big-noodle.ttf");
+}
+
+@font-face {
+	font-family: flexDisplay;
+	src: url("basic-title.ttf");
+}
+
+html {
+	font-family: bigNoodle;
+	background-color: #3d3d3d;
+}
+
+body {
+	margin: 0px;
+}
+
+#title {
+	font-size: 20vh;
+	color: #97be0d;
+	text-align: center;
+	margin: 0;
+}
+
+#subtitle {
+	font-family: flexDisplay;
+	font-size: 4vh;
+	color: #dddddd;
+	text-align: center;
+	margin: 0;
+	padding: 5px;
+}
+
+.center {
+	position: absolute;
+	width: 100%;
+	margin: 0 auto;
+	bottom: 50%;
+	text-align: center;
 }
 
 #videos {
-  display: table;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 800px;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 800px;
 }
 
 .video {
-  border: solid 1px grey;
-  width: 200px;
-  height: 100px;
-  float: left;
+	border: solid 1px grey;
+	width: 200px;
+	height: 100px;
+	float: left;
 }

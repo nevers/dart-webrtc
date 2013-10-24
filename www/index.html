@@ -2,13 +2,29 @@
 
 <html>
 <head>
-	<title>WebRTC</title>
-	<link rel="stylesheet" type="text/css" href="index.css" />
+<title>WebRTC</title>
+<link rel="stylesheet" type="text/css" href="index.css" />
+<link rel="stylesheet" type="text/css" href="animate.min.css" />
+<link rel="stylesheet" type="text/css" href="animate.title.css" />
 </head>
 
 <body>
-	<header>WebRTC</header>
-    <div id="videos"></div>
+	<div class="center">
+		<div id="title" class="animated fadeInDown">
+			<span>W</span> 
+			<span>e</span>
+			<span>b</span>
+			<span>R</span> 
+			<span>T</span>
+			<span>C</span>
+		</div>
+		
+		<div id="subtitle" class="animated fadeInUp">
+			Waiting for participants...
+		</div>
+	</div>
+
+	<div id="videos"></div>
 	<script type="application/dart" src="index.dart"></script>
 	<script src="index.js"></script>
 </body>

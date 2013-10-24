@@ -1,1 +1,14 @@
+- Bug: for some reason, a client tries to send messages to a socket wich does not exist:
+I think we just want to send an offer to a client who just disappeard. So refreshing a lot might trigger this. 
+WebSocket is already in CLOSING or CLOSED state. webrtcstreammanager.dart:44
+WebRtcStreamManager.sendMessage$1 webrtcstreammanager.dart:44
+WebRtcStreamManager_sendOffer__closure.call$1 webrtcstreammanager.dart:120
+invokeClosure_closure0.call$0 js_helper.dart:1474
+_IsolateContext.eval$1 isolate_helper.dart:274
+_callInIsolate isolate_helper.dart:62
+invokeClosure js_helper.dart:1474
+(anonymous function)
+
 - Add some fancy CSS3 shizzle
+- Get firefox working
+- Figure out why permissions are asked multiple times per connection.
