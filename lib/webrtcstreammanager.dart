@@ -15,7 +15,6 @@ class WebRtcStreamManager {
   WebRtcStreamManager() {
     sendingRtcPeerConnections = new Map();
     receivingRtcPeerConnections = new Map();
-    
     cachingUserMediaRetriever = new CachingUserMediaRetriever();
     
     var uri = "ws://" + window.location.host + "/ws";
@@ -30,11 +29,11 @@ class WebRtcStreamManager {
   
   RtcPeerConnection createRtcPeerConnection() {
     var rtcIceServers = {
-                         "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
+      "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
     };
 
     var mediaConstraints = {
-                            "optional": [{"RtpDataChannels": true}, {"DtlsSrtpKeyAgreement": true}]
+      "optional": [{"RtpDataChannels": true}, {"DtlsSrtpKeyAgreement": true}]
     }; 
 
     return new RtcPeerConnection(rtcIceServers, mediaConstraints);

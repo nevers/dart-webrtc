@@ -49,8 +49,6 @@ body {
 }
 
 .video {
-	border: solid 1px grey;
-	width: 200px;
 	height: 100px;
 	float: left;
 }
