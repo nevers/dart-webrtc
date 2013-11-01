@@ -42,13 +42,18 @@ body {
 }
 
 #videos {
-	display: table;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 800px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+	display: -webkit-box;
+	-webkit-box-align: center;
+	-webkit-box-pack: center;
 }
 
 .video {
-	height: 100px;
-	float: left;
+	height: 55vh;
+	padding: 2vh;
 }

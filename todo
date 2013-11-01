@@ -1,4 +1,3 @@
--Finish CSS3 shizzle
 - Bug: for some reason, a client tries to send messages to a socket wich does not exist:
 I think we just want to send an offer to a client who just disappeard. So refreshing a lot might trigger this. 
 WebSocket is already in CLOSING or CLOSED state. webrtcstreammanager.dart:44
