@@ -48,16 +48,25 @@ class WebSocketHandler {
     sockets.remove(socket);
   }
 
-  void getSocketFromClientId(clientId) {
-    return sockets.firstWhere((socket) => getClientId(socket) == clientId);
-  }
-
   void handleData(WebSocket socket, String data) {
     var parsedData = JSON.decode(data);
     var targetClientId = parsedData["targetClientId"];
+    if(!isClientAvailable(targetClientId)) return;
     parsedData["originClientId"] = getClientId(socket);
     var targetSocket = getSocketFromClientId(targetClientId);
     sendMessage(targetSocket, JSON.encode(parsedData));
+  }
+
+  void isClientAvailable(clientId) {
+    try {
+      sockets.firstWhere((socket) => getClientId(socket) == clientId);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  void getSocketFromClientId(clientId) {
+    return sockets.firstWhere((socket) => getClientId(socket) == clientId);
   }
 
   int getClientId(socket) {

@@ -18,11 +18,17 @@ void main() {
 }
 
 void hideTitle(Function onAnimationEnd) {
+  var cssClassFadeOutDown = "animated fadeOutDown";
+  var cssClassFadeOutUp = "animated fadeOutUp";
   bool isCalledback = false;
   var title = querySelector("#title");
   var subtitle = querySelector("#subtitle");
-  title.className = "animated fadeOutUp";
-  subtitle.className = "animated fadeOutDown";
+
+  if(title.className == cssClassFadeOutUp || subtitle.className == cssClassFadeOutDown)
+    onAnimationEnd();
+
+  title.className = cssClassFadeOutUp;
+  subtitle.className = cssClassFadeOutDown;
   window.onAnimationEnd.listen((AnimationEvent event) {
     if(!isCalledback && (event.target == title || event.target == subtitle)) {
       onAnimationEnd();
