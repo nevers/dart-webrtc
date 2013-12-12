@@ -1,4 +1,2 @@
-- When a video is added, removed and then added, there is no animation.
-- Show title and subtitle again when there are no streams.
 - Get firefox send sending stream working.
 - Figure out why permissions are asked multiple times per connection.

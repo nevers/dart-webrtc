@@ -2,6 +2,13 @@ import "dart:html";
 import "dart:async";
 import "../lib/webrtcstreammanager.dart";
 
+var cssClassFadeOutUp = "animated fadeOutUp";
+var cssClassFadeOutDown = "animated fadeOutDown";
+var cssClassFadeInUp = "animated fadeInUp";
+var cssClassFadeInDown = "animated fadeInDown";
+var cssClassAddVideo = "animated flipInY";
+var cssClassRemoveVideo = "animated bounceOutDown";
+
 var receivingVideoElements = new Map();
 
 void main() {
@@ -18,14 +25,14 @@ void main() {
 }
 
 void hideTitle(Function onAnimationEnd) {
-  var cssClassFadeOutDown = "animated fadeOutDown";
-  var cssClassFadeOutUp = "animated fadeOutUp";
   bool isCalledback = false;
   var title = querySelector("#title");
   var subtitle = querySelector("#subtitle");
 
-  if(title.className == cssClassFadeOutUp || subtitle.className == cssClassFadeOutDown)
+  if(title.className == cssClassFadeOutUp || subtitle.className == cssClassFadeOutDown) {
     onAnimationEnd();
+    return;
+  }
 
   title.className = cssClassFadeOutUp;
   subtitle.className = cssClassFadeOutDown;
@@ -40,20 +47,35 @@ void hideTitle(Function onAnimationEnd) {
 void addVideo(String clientId, MediaStream stream) {
   print("Adding webcam: stream='${stream}'");
   var video = new VideoElement();
-  video.classes.add("video");
-  video.classes.add("animated flipInY");
   video.src = Url.createObjectUrl(stream);
   video.onLoadedData.listen((Event event) {
     video.play();
+    querySelector("#videos").children.add(video);
+    video.classes.add("video");
+    video.classes.add(cssClassAddVideo);
   });
-  querySelector("#videos").children.add(video);
   receivingVideoElements[clientId] = video;
 }
 
 void removeVideo(String clientId) {
+  //FIXME This should be handled in webRtcStreamManager!
   if(!receivingVideoElements.containsKey(clientId))
     return;
   VideoElement video = receivingVideoElements[clientId];
-  video.pause();
-  video.remove();
+  video.className = cssClassRemoveVideo;
+  window.onAnimationEnd.listen((AnimationEvent event) {
+      if(event.target != video) return;
+      video.pause();
+      video.remove();
+      receivingVideoElements.remove(clientId);
+      if(receivingVideoElements.isEmpty)
+        showTitle();
+  });
+}
+
+void showTitle() {
+  var title = querySelector("#title");
+  var subtitle = querySelector("#subtitle");
+  title.className = cssClassFadeInDown;
+  subtitle.className = cssClassFadeInUp;
 }
