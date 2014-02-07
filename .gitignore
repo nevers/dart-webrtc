@@ -1,2 +1,6 @@
 *.js*
 *.log
+.DS_Store
+.project
+packages
+pubspec.lock
