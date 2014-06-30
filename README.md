@@ -20,4 +20,5 @@ How to get started:
 > Listening for connections at 0.0.0.0:1337
 > ```
 
-4. Browse to http://localhost:1337 
+4. Browse to http://localhost:1337 and you should see the following page:
+> ![Screenshot](https://raw.github.com/nevers/dart-webrtc/master/screenshot.png)
