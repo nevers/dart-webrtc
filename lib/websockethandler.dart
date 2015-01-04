@@ -65,6 +65,7 @@ class WebSocketHandler {
       return false;
     }
   }
+
   WebSocket getSocketFromClientId(clientId) {
     return sockets.firstWhere((socket) => getClientId(socket) == clientId);
   }

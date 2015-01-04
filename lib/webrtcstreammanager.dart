@@ -181,7 +181,7 @@ class WebRtcStreamManager {
   }
   
   void handleSuccess() {
-    log("Success: ...");
+    log("Success");
   }
   
   void handleError(errorMessage) {
