@@ -4,7 +4,7 @@ import "dart:io";
 
 //TODO Add headers depending on the file extension
 class FileHandler {
-  static final String DOCUMENT_ROOT = "www";
+  static final String DOCUMENT_ROOT = "../web";
 
   void handleRequest(HttpRequest request) {
     String path = (request.uri.path.endsWith('/')) ? "${request.uri.path}index.html" : request.uri.path;
