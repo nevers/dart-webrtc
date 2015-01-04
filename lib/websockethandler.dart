@@ -57,7 +57,7 @@ class WebSocketHandler {
     sendMessage(targetSocket, JSON.encode(parsedData));
   }
 
-  void isClientAvailable(clientId) {
+  bool isClientAvailable(clientId) {
     try {
       sockets.firstWhere((socket) => getClientId(socket) == clientId);
       return true;
@@ -65,7 +65,7 @@ class WebSocketHandler {
       return false;
     }
   }
-  void getSocketFromClientId(clientId) {
+  WebSocket getSocketFromClientId(clientId) {
     return sockets.firstWhere((socket) => getClientId(socket) == clientId);
   }
 
