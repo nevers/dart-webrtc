@@ -1,7 +1,7 @@
 import "dart:io";
 import "dart:async";
-import "lib/filehandler.dart";
-import "lib/websockethandler.dart";
+import 'package:dart_webrtc/filehandler.dart';
+import 'package:dart_webrtc/websockethandler.dart';
 
 var bindAddress = "0.0.0.0";
 var port = 1337;

@@ -1,6 +1,6 @@
 import "dart:html";
 import "dart:async";
-import "../lib/webrtcstreammanager.dart";
+import "packages/dart_webrtc/webrtcstreammanager.dart";
 
 var cssClassFadeOutUp = "animated fadeOutUp";
 var cssClassFadeOutDown = "animated fadeOutDown";
@@ -44,7 +44,7 @@ void hideTitle(Function onAnimationEnd) {
   });
 }
 
-void addVideo(String clientId, MediaStream stream) {
+void addVideo(int clientId, MediaStream stream) {
   print("Adding webcam: stream='${stream}'");
   var video = new VideoElement();
   video.src = Url.createObjectUrl(stream);
@@ -57,7 +57,7 @@ void addVideo(String clientId, MediaStream stream) {
   receivingVideoElements[clientId] = video;
 }
 
-void removeVideo(String clientId) {
+void removeVideo(int clientId) {
   //FIXME This should be handled in webRtcStreamManager!
   if(!receivingVideoElements.containsKey(clientId))
     return;

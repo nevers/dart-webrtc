@@ -2,7 +2,7 @@ library webrtcstreammanager;
 
 import "dart:html";
 import "dart:convert";
-import "../lib/cachingusermediaretriever.dart";
+import "cachingusermediaretriever.dart";
 
 class WebRtcStreamManager {
   WebSocket webSocket;
@@ -162,14 +162,14 @@ class WebRtcStreamManager {
     var rtcIceCandidate = new RtcIceCandidate({"sdpMLineIndex": candidate["sdpMLineIndex"], "candidate": candidate["candidate"]});
     log("handleReceiverCandidate: originClientId=${originClientId}");
     var sendingRtcPeerConnection = sendingRtcPeerConnections[originClientId];
-    sendingRtcPeerConnection.addIceCandidate(rtcIceCandidate);
+    sendingRtcPeerConnection.addIceCandidate(rtcIceCandidate, handleSuccess, handleError);
   }
 
   void handleSenderCandidate(originClientId, candidate) {
     var rtcIceCandidate = new RtcIceCandidate({"sdpMLineIndex": candidate["sdpMLineIndex"], "candidate": candidate["candidate"]});
-    log("handleSenderCandidate: originClientId='${originClientId}'");
+    log("handleSenderCandidate: originClientId=${originClientId}");
     var receivingRtcPeerConnection = receivingRtcPeerConnections[originClientId];
-    receivingRtcPeerConnection.addIceCandidate(rtcIceCandidate);
+    receivingRtcPeerConnection.addIceCandidate(rtcIceCandidate, handleSuccess, handleError);
   }
   
   void setStreamAddHandler(var handler) {
@@ -178,6 +178,10 @@ class WebRtcStreamManager {
   
   void setStreamRemoveHandler(var handler) {
     streamRemoveHandler = handler;
+  }
+  
+  void handleSuccess() {
+    log("Success: ...");
   }
   
   void handleError(errorMessage) {
