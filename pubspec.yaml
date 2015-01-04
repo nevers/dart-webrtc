@@ -1,0 +1,5 @@
+name: dart_webrtc
+
+dependencies:
+  browser: any
+  logging: any
