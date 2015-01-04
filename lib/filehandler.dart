@@ -37,6 +37,8 @@ class FileHandler {
         return ContentType.parse("text/html; charset=UTF-8");
       case ".css":
         return ContentType.parse("text/css; charset=UTF-8");
+      case ".dart":
+        return ContentType.parse("application/dart; charset=UTF-8");
       case ".js":
         return ContentType.parse("application/javascript; charset=UTF-8");
       case ".ico":
