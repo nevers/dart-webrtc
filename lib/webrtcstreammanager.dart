@@ -2,7 +2,7 @@ library webrtcstreammanager;
 
 import "dart:html";
 import "dart:convert";
-import "../lib/cachingusermediaretriever.dart";
+import "cachingusermediaretriever.dart";
 
 class WebRtcStreamManager {
   WebSocket webSocket;

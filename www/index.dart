@@ -1,6 +1,6 @@
 import "dart:html";
 import "dart:async";
-import "../lib/webrtcstreammanager.dart";
+import "packages/dart_webrtc/webrtcstreammanager.dart";
 
 var cssClassFadeOutUp = "animated fadeOutUp";
 var cssClassFadeOutDown = "animated fadeOutDown";
