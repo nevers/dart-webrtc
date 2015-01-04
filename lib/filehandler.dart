@@ -41,6 +41,8 @@ class FileHandler {
         return ContentType.parse("application/dart; charset=UTF-8");
       case ".js":
         return ContentType.parse("application/javascript; charset=UTF-8");
+      case ".ttf":
+        return ContentType.parse("application/x-font-ttf");
       case ".ico":
         return ContentType.parse("image/ico");
       default:
