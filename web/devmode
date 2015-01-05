@@ -32,8 +32,7 @@ function watch_changes() {
 }
 
 function target_name_from_file() {
-	FILE=$1
-	echo $FILE | sed "s/\(^.*\)\..*/\1.js/g"
+	echo $1.js
 }	
 
 function compile() {
