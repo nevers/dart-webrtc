@@ -4,3 +4,4 @@
 .project
 packages
 pubspec.lock
+build
